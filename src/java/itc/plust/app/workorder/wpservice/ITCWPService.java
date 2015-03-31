@@ -121,6 +121,7 @@ public class ITCWPService extends PlusTWPService implements ITCWPServiceRemote {
             //Date exchangeDate = new Date();
             String orgid = mboOwner.getString("ORGID");
             double listPrice;
+            double exchangeRate = 0;
 
             logdebug("currencyFrom", currencyFrom);
             logdebug("currencyTo", currencyTo);
@@ -132,7 +133,7 @@ public class ITCWPService extends PlusTWPService implements ITCWPServiceRemote {
                 logdebug("currencyFrom != null && !currencyFrom.isEmpty()");
                 listPrice = curService.calculateCurrencyCost(getUserInfo(), currencyFrom, currencyTo, preciolistaProv, exchangeDate, orgid);  //ok
 
-                double exchangeRate = curService.getCurrencyExchangeRate(getUserInfo(), currencyFrom, currencyTo, exchangeDate, getString("ORGID"));
+                exchangeRate = curService.getCurrencyExchangeRate(getUserInfo(), currencyFrom, currencyTo, exchangeDate, getString("ORGID"));
                 logdebug("exchangeRate", exchangeRate);
             } else {
                 logdebug("currencyFrom == null || currencyFrom.isEmpty()");
@@ -141,6 +142,7 @@ public class ITCWPService extends PlusTWPService implements ITCWPServiceRemote {
 
             logdebug("ITCPULISTAOT", Double.toString(listPrice));
             getMboValue("ITCPULISTAOT").setValue(listPrice, NOACCESSCHECK);
+            getMboValue("ITCEXCHANGERATE").setValue(exchangeRate, NOACCESSCHECK | NOVALIDATION_AND_NOACTION);
 
         }
 
