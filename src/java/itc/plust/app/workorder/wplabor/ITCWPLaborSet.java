@@ -26,6 +26,7 @@ public class ITCWPLaborSet extends PlusTWPLaborSet implements ITCWPLaborSetRemot
     }
 
     @Override
+
     protected Mbo getMboInstance(MboSet mboset) throws MXException, RemoteException {
         return new ITCWPLabor(mboset);
     }
