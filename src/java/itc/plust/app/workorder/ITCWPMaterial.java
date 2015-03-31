@@ -118,9 +118,11 @@ public class ITCWPMaterial extends PlusTWPMaterial implements ITCWPMaterialRemot
             String currencyFrom = getMboValue("ITCCURRENCYCODE").getString();
             String currencyTo = mboOwner.getString("ITCCURRENCYCODE");
             double preciolistaProv = getMboValue("ITCPULISTAPROV").getDouble();
-            Date exchangeDate = new Date();
+            Date exchangeDate = MXServer.getMXServer().getDate(getClientLocale(), getClientTimeZone());
+            //Date exchangeDate = new Date();
             String orgid = mboOwner.getString("ORGID");
             double listPrice;
+            double exchangeRate = 0;
 
             logdebug("currencyFrom", currencyFrom);
             logdebug("currencyTo", currencyTo);
@@ -131,6 +133,9 @@ public class ITCWPMaterial extends PlusTWPMaterial implements ITCWPMaterialRemot
             if (currencyFrom != null && !currencyFrom.isEmpty()) {
                 logdebug("currencyFrom != null && !currencyFrom.isEmpty()");
                 listPrice = curService.calculateCurrencyCost(getUserInfo(), currencyFrom, currencyTo, preciolistaProv, exchangeDate, orgid);  //ok
+
+                exchangeRate = curService.getCurrencyExchangeRate(getUserInfo(), currencyFrom, currencyTo, exchangeDate, getString("ORGID"));
+                logdebug("exchangeRate", exchangeRate);
             } else {
                 logdebug("currencyFrom == null || currencyFrom.isEmpty()");
                 listPrice = preciolistaProv;
@@ -138,6 +143,7 @@ public class ITCWPMaterial extends PlusTWPMaterial implements ITCWPMaterialRemot
 
             logdebug("ITCPULISTAOT", Double.toString(listPrice));
             getMboValue("ITCPULISTAOT").setValue(listPrice, NOACCESSCHECK);
+            getMboValue("ITCEXCHANGERATE").setValue(exchangeRate, NOACCESSCHECK | NOVALIDATION_AND_NOACTION);
 
         }
 

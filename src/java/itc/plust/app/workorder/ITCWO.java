@@ -60,6 +60,23 @@ public class ITCWO extends PlusTWO implements ITCWORemote {
         logdebug(LOGEND, "itcIncrTotalManoObra(double incrAmount)");
     }
 
+    @Override
+    public void itcIncrTotalServicios(double incrAmount) throws MXException, RemoteException {
+        logdebug(LOGBEGIN, "itcIncrTotalServicios(double incrAmount)");
+        logdebug("incrAmount", incrAmount);
+        double newValue = MXMath.add(getDouble("ITCTOTALSERVICIOS"), incrAmount);
+        logdebug("newValue", newValue);
+
+        if (MXMath.compareTo(newValue, 0.0D) > 0) {
+            logdebug("if (MXMath.compareTo(newValue, 0.0D) > 0)");
+            setValue("ITCTOTALSERVICIOS", newValue, NOACCESSCHECK);
+        } else {
+            logdebug("if (MXMath.compareTo(newValue, 0.0D) <= 0)");
+            setValue("ITCTOTALSERVICIOS", 0.0D, NOACCESSCHECK);
+        }
+        logdebug(LOGEND, "itcIncrTotalServicios(double incrAmount)");
+    }
+
     /**
      * Este método imprime mensajes en log de MAXIMO
      *

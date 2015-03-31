@@ -1,5 +1,6 @@
 package itc.plust.app.workorder;
 
+import itc.plust.app.workorder.wpservice.ITCWPServiceSetRemote;
 import java.rmi.RemoteException;
 import java.util.Date;
 import psdi.app.currency.FldCurrencyCode;
@@ -39,11 +40,12 @@ public class ITCFldWOCurrencyCode extends FldCurrencyCode {
          if (wpmaterialSet != null) {
          wpmaterialSet.itcCalcularMargen();
          }
-         ITCWPMaterialSetRemote wpserviceSet = (ITCWPMaterialSetRemote) thisMbo.getMboSet("SHOWPLANSERVICE");
-         if (wpserviceSet != null) {
-         wpserviceSet.itcCalcularMargen();
-         }
          */
+        ITCWPServiceSetRemote wpserviceSet = (ITCWPServiceSetRemote) thisMbo.getMboSet("WPSERVICE");
+        if (wpserviceSet != null) {
+            wpserviceSet.itcCalculaPrecioOT();
+        }
+
     }
 
     /**

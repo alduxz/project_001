@@ -13,4 +13,6 @@ public abstract interface ITCWORemote extends PlusTWORemote {
     public abstract void itcIncrTotalMateriales(double incrAmount) throws MXException, RemoteException;
 
     public abstract void itcIncrTotalManoObra(double incrAmount) throws MXException, RemoteException;
+
+    public abstract void itcIncrTotalServicios(double incrAmount) throws MXException, RemoteException;
 }
