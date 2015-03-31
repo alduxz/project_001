@@ -4,13 +4,11 @@
  */
 package itc.plust.app.workorder.wpservice;
 
-import itc.plust.app.workorder.*;
 import java.rmi.RemoteException;
 import java.util.Date;
-import psdi.app.currency.FldCurrencyCode;
-import psdi.mbo.Mbo;
 import psdi.mbo.MboRemote;
 import psdi.mbo.MboValue;
+import psdi.mbo.MboValueAdapter;
 import psdi.util.MXException;
 import psdi.util.logging.MXLogger;
 import psdi.util.logging.MXLoggerFactory;
@@ -19,14 +17,14 @@ import psdi.util.logging.MXLoggerFactory;
  *
  * @author TOSHIBA
  */
-public class ITCFldWpCurrencyCode extends FldCurrencyCode {
+public class ITCFldWpServTaxCode extends MboValueAdapter {
 
     private final MXLogger log = MXLoggerFactory.getLogger("maximo.customization.WORKORDER");
     private final long LOGBEGIN = 0L;
     private final long LOGEND = 1L;
     private final long LOGRUNNING = 2L;
 
-    public ITCFldWpCurrencyCode(MboValue mbv) throws MXException {
+    public ITCFldWpServTaxCode(MboValue mbv) throws MXException {
         super(mbv);
     }
 
@@ -34,19 +32,16 @@ public class ITCFldWpCurrencyCode extends FldCurrencyCode {
     public void action() throws MXException, RemoteException {
         logdebug(LOGBEGIN, "action()");
         super.action();
+
+        logdebug(LOGRUNNING, "BEFOREACTION");
+
         MboRemote thisMbo = getMboValue().getMbo();
 
         if (thisMbo != null) {
-            Mbo mbo = getMboValue().getMbo();
-            MboRemote mboOwner = mbo.getOwner();    //workorder
+            ITCWPServiceRemote wpserviceMbo = (ITCWPServiceRemote) thisMbo;
 
-            if (!mboOwner.isNull("ITCCURRENCYCODE")) {
-
-                ITCWPMaterialRemote wpmaterialMbo = (ITCWPMaterialRemote) thisMbo;
-
-                logdebug(LOGRUNNING, "ITCWPMaterialRemote.itcCalculaPrecioOT()");
-                wpmaterialMbo.itcCalculaPrecioOT();
-            }
+            logdebug(LOGRUNNING, "ITCWPMaterialRemote.itcCalcularMargen(getMboValue())");
+            wpserviceMbo.itcCalcularMargen();
         }
         logdebug(LOGEND, "action()");
     }
