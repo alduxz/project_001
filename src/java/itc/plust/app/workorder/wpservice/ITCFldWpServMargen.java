@@ -54,7 +54,7 @@ public class ITCFldWpServMargen extends MboValueAdapter {
         if (thisMbo != null) {
             ITCWPServiceRemote wpserviceMbo = (ITCWPServiceRemote) thisMbo;
 
-            logdebug(LOGRUNNING, "ITCWPMaterialRemote.itcCalcularMargen(getMboValue())");
+            logdebug(LOGRUNNING, "ITCWPServiceRemote.itcCalcularMargen(getMboValue())");
             wpserviceMbo.itcCalcularMargen();
         }
         logdebug(LOGEND, "action()");

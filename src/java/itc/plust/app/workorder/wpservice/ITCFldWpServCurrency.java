@@ -43,7 +43,7 @@ public class ITCFldWpServCurrency extends FldCurrencyCode {
 
                 ITCWPServiceRemote wpserviceMbo = (ITCWPServiceRemote) thisMbo;
 
-                logdebug(LOGRUNNING, "ITCWPMaterialRemote.itcCalculaPrecioOT()");
+                logdebug(LOGRUNNING, "ITCWPServiceRemote.itcCalculaPrecioOT()");
                 wpserviceMbo.itcCalculaPrecioOT();
             }
         }

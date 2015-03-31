@@ -1,11 +1,14 @@
+/*
+ * To change this template, choose Tools | Templates
+ * and open the template in the editor.
+ */
 package itc.plust.app.workorder.wpservice;
 
 import java.rmi.RemoteException;
 import java.util.Date;
-import psdi.mbo.Mbo;
-import psdi.mbo.MboServerInterface;
-import psdi.mbo.MboSet;
-import psdi.plust.app.workorder.PlusTWPServiceSet;
+import psdi.mbo.MboRemote;
+import psdi.mbo.MboValue;
+import psdi.plusp.app.workorder.PlusPFldWpSerQty;
 import psdi.util.MXException;
 import psdi.util.logging.MXLogger;
 import psdi.util.logging.MXLoggerFactory;
@@ -14,31 +17,30 @@ import psdi.util.logging.MXLoggerFactory;
  *
  * @author TOSHIBA
  */
-public class ITCWPServiceSet extends PlusTWPServiceSet implements ITCWPServiceSetRemote {
+public class ITCFldWpServItemQty extends PlusPFldWpSerQty {
 
     private final MXLogger log = MXLoggerFactory.getLogger("maximo.customization.WORKORDER");
     private final long LOGBEGIN = 0L;
     private final long LOGEND = 1L;
     private final long LOGRUNNING = 2L;
 
-    public ITCWPServiceSet(MboServerInterface ms) throws MXException, RemoteException {
-        super(ms);
+    public ITCFldWpServItemQty(MboValue mbv) throws MXException {
+        super(mbv);
     }
 
     @Override
-    protected Mbo getMboInstance(MboSet mboset) throws MXException, RemoteException {
-        return new ITCWPService(mboset);
-    }
+    public void action() throws MXException, RemoteException {
+        logdebug(LOGBEGIN, "action()");
+        super.action();
+        MboRemote thisMbo = getMboValue().getMbo();
 
-    @Override
-    public void itcCalculaPrecioOT() throws MXException, RemoteException {
-        logdebug(LOGBEGIN, "FOR itcCalculaPrecioOT()");
+        if (thisMbo != null) {
+            ITCWPServiceRemote wpserviceMbo = (ITCWPServiceRemote) thisMbo;
 
-        for (ITCWPServiceRemote wpservicioMbo = (ITCWPServiceRemote) this.moveFirst(); wpservicioMbo != null; wpservicioMbo = (ITCWPServiceRemote) this.moveNext()) {
-            wpservicioMbo.itcCalculaPrecioOT();
+            logdebug(LOGRUNNING, "ITCWPServiceRemote.itcCalcularMargen(getMboValue())");
+            wpserviceMbo.itcCalcularMargen();
         }
-
-        logdebug(LOGEND, "END FOR itcCalculaPrecioOT()");
+        logdebug(LOGEND, "action()");
     }
 
     /**
@@ -101,5 +103,4 @@ public class ITCWPServiceSet extends PlusTWPServiceSet implements ITCWPServiceSe
             log.debug(">>>> VALUE " + getClass().getSimpleName() + " -> " + varname + ": " + value);
         }
     }
-
 }

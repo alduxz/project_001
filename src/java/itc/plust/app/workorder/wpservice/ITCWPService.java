@@ -19,7 +19,7 @@ import psdi.util.logging.MXLoggerFactory;
 
 /**
  *
- * @author TOSHIBA psdi.plust.app.workorder.PlusTWPMaterialSet
+ * @author TOSHIBA
  */
 public class ITCWPService extends PlusTWPService implements ITCWPServiceRemote {
 
@@ -46,27 +46,25 @@ public class ITCWPService extends PlusTWPService implements ITCWPServiceRemote {
 
     @Override
     public void itcCalcularMargen() throws MXException, RemoteException {
-        logdebug(LOGBEGIN, "itcCalcularMargen()");
+        logdebug(LOGBEGIN, "ITCWPService.itcCalcularMargen()");
         double itemqty = getDouble("ITEMQTY");
         double itcpreciolistaprov = getDouble("ITCPULISTAPROV");  //PRECIO PROVEEDOR
         double itclistprice = getDouble("ITCPULISTAOT");  //PRECIO OT
-        double itcuimp = getDouble("ITCUIMP");  //costo unitario de importación
+
         double itcmargen = getDouble("ITCMARGEN");   //margen
-        double itcdctocliente = getDouble("ITCDCTOCLIENTE");  //descuento
 
-        logdebug("WPMATERIAL.ITEMQTY: " + Double.toString(itemqty));
-        logdebug("WPMATERIAL.ITCPRECIOLISTAPROV: " + Double.toString(itcpreciolistaprov));
-        logdebug("WPMATERIAL.ITCPULISTAOT: " + Double.toString(itclistprice));
-        logdebug("WPMATERIAL.ITCUIMP: " + Double.toString(itcuimp));
-        logdebug("WPMATERIAL.ITCMARGEN: " + Double.toString(itcmargen));
-        logdebug("WPMATERIAL.ITCDCTOCLIENTE: " + Double.toString(itcdctocliente));
+        logdebug("WPSERVICE.ITEMQTY: " + Double.toString(itemqty));
+        logdebug("WPSERVICE.ITCPRECIOLISTAPROV: " + Double.toString(itcpreciolistaprov));
+        logdebug("WPSERVICE.ITCPULISTAOT: " + Double.toString(itclistprice));
 
-        double itcvalorventa_sindscto = (itcuimp + itclistprice) * (1D + (itcmargen / 100D));  //importe unitario con margen de ganancia
-        double itcvalorventaunitario = itcvalorventa_sindscto * (1D - (itcdctocliente / 100D));  //importe unitario con descuento
+        logdebug("WPSERVICE.ITCMARGEN: " + Double.toString(itcmargen));
+
+        double itcvalorventaunitario = (itclistprice) * (1D + (itcmargen / 100D));  //importe unitario con margen de ganancia
+
         double itcvalorventalinea = itcvalorventaunitario * itemqty;
         double igvrate = 0D;
 
-        MboSetRemote igvTaxSet = getMboSet("$IGVTAX", "TAX", "taxcode=:ITCTAXCODE and orgid=:orgid");  //buscar relación -crear el campo en el wpmaterial
+        MboSetRemote igvTaxSet = getMboSet("$IGVTAX", "TAX", "taxcode=:ITCTAXCODE and orgid=:orgid");
 
         if (igvTaxSet != null && !igvTaxSet.isEmpty()) {
             logdebug("igvTaxSet != null && !igvTaxSet.isEmpty()");
@@ -95,19 +93,19 @@ public class ITCWPService extends PlusTWPService implements ITCWPServiceRemote {
         setValue("ITCPVLINEA", itctotal, NOACCESSCHECK | NOVALIDATION_AND_NOACTION);
         setValue("ITCPVUNITARIO", itctotalunitario, NOACCESSCHECK | NOVALIDATION_AND_NOACTION);
 
-        logdebug("WPMATERIAL.ITCVVUNITARIO: " + Double.toString(getDouble("ITCVVUNITARIO")));
-        logdebug("WPMATERIAL.ITCVVLINEA: " + Double.toString(getDouble("ITCVVLINEA")));
+        logdebug("WPSERVICE.ITCVVUNITARIO: " + Double.toString(getDouble("ITCVVUNITARIO")));
+        logdebug("WPSERVICE.ITCVVLINEA: " + Double.toString(getDouble("ITCVVLINEA")));
 
-        logdebug("WPMATERIAL.ITCIGV: " + Double.toString(getDouble("ITCIGV")));
-        logdebug("WPMATERIAL.ITCPVLINEA: " + Double.toString(getDouble("ITCPVLINEA")));
-        logdebug("WPMATERIAL.ITCPVUNITARIO: " + Double.toString(getDouble("ITCPVUNITARIO")));
+        logdebug("WPSERVICE.ITCIGV: " + Double.toString(getDouble("ITCIGV")));
+        logdebug("WPSERVICE.ITCPVLINEA: " + Double.toString(getDouble("ITCPVLINEA")));
+        logdebug("WPSERVICE.ITCPVUNITARIO: " + Double.toString(getDouble("ITCPVUNITARIO")));
 
-        logdebug(LOGEND, "itcCalcularMargen()");
+        logdebug(LOGEND, "ITCWPService.itcCalcularMargen()");
     }
 
     @Override
     public void itcCalculaPrecioOT() throws MXException, RemoteException {
-        logdebug(LOGBEGIN, "itcCalculaPrecioOT()");
+        logdebug(LOGBEGIN, "ITCWPService.itcCalculaPrecioOT()");
 
         MboRemote mboOwner = getOwner();    //workorder
 
@@ -146,7 +144,7 @@ public class ITCWPService extends PlusTWPService implements ITCWPServiceRemote {
 
         }
 
-        logdebug(LOGEND, "itcCalculaPrecioOT()");
+        logdebug(LOGEND, "ITCWPService.itcCalculaPrecioOT()");
     }
 
     @Override
@@ -168,7 +166,7 @@ public class ITCWPService extends PlusTWPService implements ITCWPServiceRemote {
 
         if (getThisMboSet().count(COUNT_AFTERSAVE) == 0) {
             logdebug("if (getThisMboSet().count(COUNT_AFTERSAVE) == 0)");
-            refWo.setValue("ITCTOTALMATERIALES", 0.0D, NOACCESSCHECK);
+            refWo.setValue("ITCTOTALSERVICIOS", 0.0D, NOACCESSCHECK);
         }
 
         logdebug(LOGRUNNING, "this.itcUpdateTotals(refWo, true);");
@@ -190,8 +188,8 @@ public class ITCWPService extends PlusTWPService implements ITCWPServiceRemote {
                 itcvvlinea *= -1.0D;
             }
             logdebug("itcvvlinea", itcvvlinea);
-            logdebug(LOGRUNNING, "((ITCWORemote) wo).itcIncrTotalMateriales(itcvvlinea);");
-            ((ITCWORemote) wo).itcIncrTotalMateriales(itcvvlinea);
+            logdebug(LOGRUNNING, "((ITCWORemote) wo).itcIncrTotalServicios(itcvvlinea);");
+            ((ITCWORemote) wo).itcIncrTotalServicios(itcvvlinea);
         }
         logdebug(LOGEND, "itcUpdateTotals(MboRemote wo, boolean isGain)");
     }

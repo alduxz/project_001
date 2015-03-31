@@ -1,6 +1,6 @@
 package itc.plust.app.workorder.wpservice;
 
-import itc.plust.app.workorder.*;
+import itc.plust.app.workorder.ITCWORemote;
 import java.rmi.RemoteException;
 import java.util.Date;
 import psdi.mbo.MboValue;
@@ -41,8 +41,8 @@ public class ITCFldWpServValorVenta extends MboValueAdapter {
         logdebug("oldValue", oldValue);
         logdebug("newValue", newValue);
 
-        logdebug(LOGRUNNING,"thisWO.itcIncrTotalMateriales(newValue);");
-        thisWO.itcIncrTotalMateriales(newValue);
+        logdebug(LOGRUNNING, "thisWO.itcIncrTotalServicios(newValue);");
+        thisWO.itcIncrTotalServicios(newValue);
 
         logdebug(LOGEND, "action()");
     }

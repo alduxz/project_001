@@ -57,7 +57,7 @@ public class ITCFldWpServPrecioListaProv extends MboValueAdapter {
 
                 ITCWPServiceRemote wpserviceMbo = (ITCWPServiceRemote) thisMbo;
 
-                logdebug(LOGRUNNING, "ITCWPMaterialRemote.itcCalculaPrecioOT()");
+                logdebug(LOGRUNNING, "ITCWPServiceRemote.itcCalculaPrecioOT()");
                 wpserviceMbo.itcCalculaPrecioOT();
             }
 

@@ -1,6 +1,5 @@
 package itc.plust.app.workorder.wpservice;
 
-import itc.plust.app.workorder.*;
 import java.rmi.RemoteException;
 import java.util.Date;
 import static psdi.mbo.MboConstants.NOACCESSCHECK;
@@ -53,7 +52,7 @@ public class ITCFldWpServProveedor extends MboValueAdapter {
         logdebug(LOGBEGIN, "getVendorCurrency()");  //2
         String currency = null;
         MboRemote mbo = getMboValue().getMbo();
-        MboSetRemote vendorSet = mbo.getMboSet("ITCCOMPANY");  //relacion ITCOMPANY del objeto wpmaterial // select *
+        MboSetRemote vendorSet = mbo.getMboSet("ITCCOMPANY");
 
         if (vendorSet != null && !vendorSet.isEmpty()) {   //evaluar nulo o vacio
             logdebug("vendorSet != null && !vendorSet.isEmpty()");
