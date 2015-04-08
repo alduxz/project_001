@@ -30,19 +30,25 @@ public class ITCFldWpDsctoCliente extends MboValueAdapter {
         super(mbv);
     }
 
+    /**
+     *
+     * @throws MXException
+     * @throws RemoteException
+     */
     @Override
     public void validate() throws MXException, RemoteException {
-
+        logdebug(LOGBEGIN, "validate()");
         super.validate();
 
-        if (MXMath.compareTo(getMboValue().getDouble(), 0.0D) < 0) {
-
+        if ((MXMath.compareTo(getMboValue().getDouble(), 0.0D) < 0) || getMboValue().isNull()) {
+            logdebug("((MXMath.compareTo(getMboValue().getDouble(), 0.0D) < 0) || getMboValue().isNull())");
             double param1 = getMboValue().getDouble();
             String param2 = getMboValue().getName();
             Object[] params = {param1, param2};
 
             throw new MXApplicationException("workorder", "itcvalorinvalido", params);
         }
+        logdebug(LOGEND, "validate()");
     }
 
     @Override
