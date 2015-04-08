@@ -28,6 +28,47 @@ public class ITCFldWpMatValCompra extends MboValueAdapter {
         super(mbv);
     }
 
+    /**
+     * Metodo para inicializar las variables
+     *
+     * @throws MXException
+     * @throws RemoteException
+     */
+    @Override
+    public void init() throws MXException, RemoteException {
+        logdebug(LOGBEGIN, "init()");
+        super.init();
+
+        MboValue thisMboValue = getMboValue();
+
+        if (!thisMboValue.isNull()) {
+            logdebug("!thisMboValue.isNull()");
+
+            boolean reqcompra = thisMboValue.getBoolean();
+            logdebug("reqcompra", reqcompra);
+
+            getMboValue("ITCCURRENCYCODE").setRequired(reqcompra);
+            getMboValue("ITCCOMPANY").setRequired(reqcompra);
+            getMboValue("ITCTIPOCOMPRA").setRequired(reqcompra);
+
+            getMboValue("ITCCURRENCYCODE").setReadOnly(!reqcompra);
+            getMboValue("ITCCOMPANY").setReadOnly(!reqcompra);
+            getMboValue("ITCTIPOCOMPRA").setReadOnly(!reqcompra);
+
+            if ((getMboValue("ITCTIPOCOMPRA").getString().equalsIgnoreCase("IMP"))) {
+                getMboValue("ITCUIMP").setReadOnly(false);
+                getMboValue("ITCUIMP").setRequired(true);
+                getMboValue("ITCUIMP").setValueNull(NOACCESSCHECK);
+            } else {
+                getMboValue("ITCUIMP").setReadOnly(true);
+                getMboValue("ITCUIMP").setRequired(false);
+                getMboValue("ITCUIMP").setValue(0D, NOACCESSCHECK);
+            }
+        }
+
+        logdebug(LOGEND, "init()");
+    }
+
     @Override
     public void action() throws MXException, RemoteException {
         logdebug(LOGBEGIN, "action()");
@@ -58,7 +99,8 @@ public class ITCFldWpMatValCompra extends MboValueAdapter {
                 getMboValue("ITCCOMPANY").setValueNull(NOACCESSCHECK | NOVALIDATION_AND_NOACTION);
                 getMboValue("ITCTIPOCOMPRA").setValueNull(NOACCESSCHECK | NOVALIDATION_AND_NOACTION);
                 getMboValue("ITCUIMP").setValueNull(NOACCESSCHECK);
-                // getMboValue("ITCPULISTAPROV").setValueNull(NOACCESSCHECK);
+                getMboValue("ITCUIMP").setRequired(reqcompra);
+                getMboValue("ITCCOMPANY").setReadOnly(!reqcompra);
 
             }
         }

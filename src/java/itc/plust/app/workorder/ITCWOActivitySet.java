@@ -1,64 +1,33 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package itc.plust.app.workorder;
 
 import java.rmi.RemoteException;
 import java.util.Date;
-import psdi.mbo.MboRemote;
-import psdi.mbo.MboValue;
-import psdi.mbo.MboValueAdapter;
-import psdi.util.MXApplicationException;
+import psdi.mbo.Mbo;
+import psdi.mbo.MboServerInterface;
+import psdi.mbo.MboSet;
+import psdi.plust.app.workorder.PlusTWOActivitySet;
 import psdi.util.MXException;
-import psdi.util.MXMath;
 import psdi.util.logging.MXLogger;
 import psdi.util.logging.MXLoggerFactory;
 
 /**
  *
- * @author TOSHIBA
+ * @author aescobar
  */
-public class ITCFldWpMatListPriceOT extends MboValueAdapter {
+public class ITCWOActivitySet extends PlusTWOActivitySet implements ITCWOActivitySetRemote {
 
     private final MXLogger log = MXLoggerFactory.getLogger("maximo.customization.WORKORDER");
     private final long LOGBEGIN = 0L;
     private final long LOGEND = 1L;
     private final long LOGRUNNING = 2L;
 
-    public ITCFldWpMatListPriceOT(MboValue mbv) throws MXException {
-        super(mbv);
+    public ITCWOActivitySet(MboServerInterface ms) throws MXException, RemoteException {
+        super(ms);
     }
 
     @Override
-    public void validate() throws MXException, RemoteException {
-
-        super.validate();
-
-        if (MXMath.compareTo(getMboValue().getDouble(), 0.0D) < 0) {
-
-            double param1 = getMboValue().getDouble();
-            String param2 = getMboValue().getName();
-            Object[] params = {param1, param2};
-
-            throw new MXApplicationException("workorder", "itcvalorinvalido", params);
-        }
-    }
-
-    @Override
-    public void action() throws MXException, RemoteException {
-        logdebug(LOGBEGIN, "action()");
-        super.action();
-        MboRemote thisMbo = getMboValue().getMbo();
-
-        if (thisMbo != null) {
-            logdebug("thisMbo != null");
-            ITCWPMaterialRemote wpmaterialMbo = (ITCWPMaterialRemote) thisMbo;
-
-            logdebug(LOGRUNNING, "ITCWPMaterialRemote.itcCalcularMargen(getMboValue())");
-            wpmaterialMbo.itcCalcularMargen();
-        }
-        logdebug(LOGEND, "action()");
+    protected Mbo getMboInstance(MboSet mboset) throws MXException, RemoteException {
+        return new ITCWOActivity(mboset);
     }
 
     /**
@@ -121,4 +90,5 @@ public class ITCFldWpMatListPriceOT extends MboValueAdapter {
             log.debug(">>>> VALUE " + getClass().getSimpleName() + " -> " + varname + ": " + value);
         }
     }
+
 }

@@ -36,14 +36,10 @@ public class ITCFldWpMatProveedor extends MboValueAdapter {
         if (thisMbo != null) {
 
             logdebug("(thisMbo != null) ");
-
             String currencyFrom = getVendorCurrency();
-
             logdebug("currencyFrom : ", currencyFrom);
-
             getMboValue("ITCCURRENCYCODE").setValue(currencyFrom, NOACCESSCHECK);
         }
-
         logdebug(LOGEND, "action()");
     }
 

@@ -43,6 +43,7 @@ public class ITCFldWpMatTipoCompra extends MboValueAdapter {
             //revisar
             if ("LOC".equals(tipoCompra)) {
                 getMboValue("ITCUIMP").setReadOnly(true);
+                getMboValue("ITCUIMP").setRequired(false);
                 getMboValue("ITCUIMP").setValueNull(NOACCESSCHECK);
             } else {
                 getMboValue("ITCUIMP").setReadOnly(false);

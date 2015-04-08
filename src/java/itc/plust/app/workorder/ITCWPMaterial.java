@@ -11,14 +11,17 @@ import psdi.mbo.MboSet;
 import psdi.mbo.MboSetRemote;
 import psdi.plust.app.workorder.PlusTWPMaterial;
 import psdi.server.MXServer;
+import psdi.util.MXApplicationException;
 import psdi.util.MXException;
 import psdi.util.MXMath;
 import psdi.util.logging.MXLogger;
 import psdi.util.logging.MXLoggerFactory;
 
 /**
+ * Clase extendida para el calculo de cotización en la pestaña Materiales de la
+ * aplicacion WorkOrder
  *
- * @author TOSHIBA psdi.plust.app.workorder.PlusTWPMaterialSet
+ * @author AESCOBAR psdi.plust.app.workorder.PlusTWPMaterialSet
  */
 public class ITCWPMaterial extends PlusTWPMaterial implements ITCWPMaterialRemote {
 
@@ -27,15 +30,87 @@ public class ITCWPMaterial extends PlusTWPMaterial implements ITCWPMaterialRemot
     private final long LOGEND = 1L;
     private final long LOGRUNNING = 2L;
 
+    /**
+     *
+     * @param ms
+     * @throws MXException
+     * @throws RemoteException
+     */
     public ITCWPMaterial(MboSet ms) throws MXException, RemoteException {
         super(ms);
     }
 
+    /**
+     *
+     * @throws MXException
+     * @throws RemoteException
+     */
     @Override
     public void add() throws MXException, RemoteException {
         super.add();
     }
 
+    /**
+     * Metodo sobreescrito para validar los campos ITCCURRENCYCODE, ITCCOMPANY,
+     * ITCTIPOCOMPRA, si el check requiere compra esta marcado.
+     *
+     * @throws MXException
+     * @throws RemoteException
+     */
+    @Override
+    public void appValidate() throws MXException, RemoteException {
+
+        logdebug(LOGBEGIN, "appValidate()");
+
+        String param2 = "";
+        logdebug("param2", param2);
+
+        MboRemote thisMbo = getMboValue("ITCCOMPRA").getMbo();
+
+        if (thisMbo != null) {
+            if (getMboValue("ITCCOMPRA").getBoolean()) {
+                logdebug("getMboValue(\"ITCCOMPRA\").getBoolean()");
+                if (isNull("ITCCURRENCYCODE") || isNull("ITCCOMPANY") || isNull("ITCTIPOCOMPRA")) {
+                    logdebug(" if (isNull(\"ITCCURRENCYCODE\") || isNull(\"ITCCOMPANY\") || isNull(\"ITCTIPOCOMPRA\")) ");
+                    if (isNull("ITCCURRENCYCODE")) {
+                        logdebug(" isNull(\"ITCCURRENCYCODE\") ");
+                        param2 = getMboValue("ITCCURRENCYCODE").getColumnTitle() + ", ";
+                    }
+                    if (isNull("ITCCOMPANY")) {
+                        logdebug(" isNull(\"ITCCOMPANY\") ");
+                        param2 = param2 + getMboValue("ITCCOMPANY").getColumnTitle() + ", ";
+                    }
+                    if (isNull("ITCTIPOCOMPRA")) {
+                        logdebug(" isNull(\"ITCTIPOCOMPRA\") ");
+                        param2 = param2 + getMboValue("ITCTIPOCOMPRA").getColumnTitle() + ", ";
+                    }
+
+                    Object[] params = {param2};
+                    throw new MXApplicationException("workorder", "itcvalornulo", params);
+                }
+                if ("IMP".equals(getMboValue("ITCTIPOCOMPRA").getString())) {
+                    logdebug("\"IMP\".equals(getMboValue(\"ITCTIPOCOMPRA\").getString() ");
+                    if (isNull("ITCUIMP")) {
+                        logdebug(" isNull(\"ITCUIMP\") ");
+                        param2 = param2 + ", " + getMboValue("ITCUIMP").getColumnTitle();
+
+                        Object[] params = {param2};
+                        throw new MXApplicationException("workorder", "itcvalornulo", params);
+                    }
+                }
+
+            }
+        }
+
+        super.appValidate();
+        logdebug(LOGEND, "appValidate()");
+    }
+
+    /**
+     *
+     * @throws MXException
+     * @throws RemoteException
+     */
     @Override
     public void save() throws MXException, RemoteException {
         logdebug(LOGBEGIN, "save()");
@@ -43,6 +118,15 @@ public class ITCWPMaterial extends PlusTWPMaterial implements ITCWPMaterialRemot
         logdebug(LOGEND, "save()");
     }
 
+    /**
+     * Metodo que calcula el importe de venta unitario y de linea, el valor del
+     * impuesto y los precios de venta unitario y de linea. Invoca el metodo
+     * action del campo ITCVVLINEA el cual actualizara el importe total cotizado
+     * para materiales
+     *
+     * @throws MXException
+     * @throws RemoteException
+     */
     @Override
     public void itcCalcularMargen() throws MXException, RemoteException {
         logdebug(LOGBEGIN, "itcCalcularMargen()");
@@ -105,20 +189,27 @@ public class ITCWPMaterial extends PlusTWPMaterial implements ITCWPMaterialRemot
     }
 
     @Override
+    /**
+     * Metodo que calcula el Precio unitario de lista en función a la moneda de
+     * la Orden de Trabajo. Invoca el metodo action de campo ITCPULISTAOT el
+     * cual llama al metodo itcCalcularMargen()
+     *
+     */
     public void itcCalculaPrecioOT() throws MXException, RemoteException {
         logdebug(LOGBEGIN, "itcCalculaPrecioOT()");
 
         MboRemote mboOwner = getOwner();    //workorder
 
-        if (!mboOwner.isNull("ITCCURRENCYCODE")) {   //WORKORDER.ITCCURRENCYCODE
-            logdebug("!mboOwner.isNull(\"ITCCURRENCYCODE\")");
+        if (!mboOwner.isNull("ITCCURRENCYCODE") || !mboOwner.isNull("ITCFECHACOTIZACION")) {
+            logdebug("!mboOwner.isNull(\"ITCCURRENCYCODE\") || !mboOwner.isNull(\"ITCFECHACOTIZACION\")");
 
             CurrencyServiceRemote curService = (CurrencyServiceRemote) MXServer.getMXServer().lookup("CURRENCY");
 
             String currencyFrom = getMboValue("ITCCURRENCYCODE").getString();
             String currencyTo = mboOwner.getString("ITCCURRENCYCODE");
             double preciolistaProv = getMboValue("ITCPULISTAPROV").getDouble();
-            Date exchangeDate = MXServer.getMXServer().getDate(getClientLocale(), getClientTimeZone());
+            Date exchangeDate = mboOwner.getDate("ITCFECHACOTIZACION");
+            //Date exchangeDate = MXServer.getMXServer().getDate(getClientLocale(), getClientTimeZone());
             //Date exchangeDate = new Date();
             String orgid = mboOwner.getString("ORGID");
             double listPrice;
@@ -132,7 +223,7 @@ public class ITCWPMaterial extends PlusTWPMaterial implements ITCWPMaterialRemot
 
             if (currencyFrom != null && !currencyFrom.isEmpty()) {
                 logdebug("currencyFrom != null && !currencyFrom.isEmpty()");
-                listPrice = curService.calculateCurrencyCost(getUserInfo(), currencyFrom, currencyTo, preciolistaProv, exchangeDate, orgid);  //ok
+                listPrice = curService.calculateCurrencyCost(getUserInfo(), currencyFrom, currencyTo, preciolistaProv, exchangeDate, orgid);
 
                 exchangeRate = curService.getCurrencyExchangeRate(getUserInfo(), currencyFrom, currencyTo, exchangeDate, getString("ORGID"));
                 logdebug("exchangeRate", exchangeRate);
@@ -150,6 +241,12 @@ public class ITCWPMaterial extends PlusTWPMaterial implements ITCWPMaterialRemot
         logdebug(LOGEND, "itcCalculaPrecioOT()");
     }
 
+    /**
+     *
+     * @param accessModifier
+     * @throws MXException
+     * @throws RemoteException
+     */
     @Override
     public void delete(long accessModifier) throws MXException, RemoteException {
         logdebug(LOGBEGIN, "delete(long accessModifier)");
@@ -161,6 +258,11 @@ public class ITCWPMaterial extends PlusTWPMaterial implements ITCWPMaterialRemot
         logdebug(LOGEND, "delete(long accessModifier)");
     }
 
+    /**
+     *
+     * @throws MXException
+     * @throws RemoteException
+     */
     @Override
     public void undelete() throws MXException, RemoteException {
         logdebug(LOGBEGIN, "undelete()");

@@ -32,10 +32,11 @@ public class ITCFldWpMatMargen extends MboValueAdapter {
 
     @Override
     public void validate() throws MXException, RemoteException {
-
+        logdebug(LOGBEGIN, "validate()");
         super.validate();
 
-        if (MXMath.compareTo(getMboValue().getDouble(), 0.0D) < 0) {
+        if ((MXMath.compareTo(getMboValue().getDouble(), 0.0D) < 0) || getMboValue().isNull()) {
+            logdebug("((MXMath.compareTo(getMboValue().getDouble(), 0.0D) < 0) || getMboValue().isNull())");
 
             double param1 = getMboValue().getDouble();
             String param2 = getMboValue().getName();
@@ -43,6 +44,8 @@ public class ITCFldWpMatMargen extends MboValueAdapter {
 
             throw new MXApplicationException("workorder", "itcvalorinvalido", params);
         }
+
+        logdebug(LOGEND, "validate()");
     }
 
     @Override

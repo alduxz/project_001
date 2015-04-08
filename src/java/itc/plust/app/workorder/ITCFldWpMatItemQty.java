@@ -9,6 +9,7 @@ import java.util.Date;
 import psdi.app.workorder.FldWpMatQty;
 import psdi.mbo.MboRemote;
 import psdi.mbo.MboValue;
+import psdi.util.MXApplicationException;
 import psdi.util.MXException;
 import psdi.util.logging.MXLogger;
 import psdi.util.logging.MXLoggerFactory;
@@ -26,6 +27,22 @@ public class ITCFldWpMatItemQty extends FldWpMatQty {
 
     public ITCFldWpMatItemQty(MboValue mbv) throws MXException {
         super(mbv);
+    }
+
+    @Override
+    public void validate() throws MXException, RemoteException {
+        logdebug(LOGBEGIN, "validate()");
+        super.validate();
+
+        if (getMboValue().getDouble() <= 0) {
+            logdebug("(MXMath.compareTo(getMboValue().getDouble(), 0.0D) < 0)");
+            double param1 = getMboValue().getDouble();
+            String param2 = getMboValue().getName();
+            Object[] params = {param1, param2};
+
+            throw new MXApplicationException("workorder", "itcvalorinvalido", params);
+        }
+        logdebug(LOGEND, "validate()");
     }
 
     @Override

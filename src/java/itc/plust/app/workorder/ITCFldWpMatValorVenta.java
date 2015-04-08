@@ -2,6 +2,7 @@ package itc.plust.app.workorder;
 
 import java.rmi.RemoteException;
 import java.util.Date;
+import psdi.mbo.MboRemote;
 import psdi.mbo.MboValue;
 import psdi.mbo.MboValueAdapter;
 import psdi.util.MXException;
@@ -30,7 +31,8 @@ public class ITCFldWpMatValorVenta extends MboValueAdapter {
         super.action();
 
         MboValue thisValue = getMboValue();
-        ITCWORemote thisWO = (ITCWORemote) thisValue.getMbo().getOwner();
+        MboRemote thisMbo = thisValue.getMbo().getOwner();
+        //ITCWORemote thisWO = (ITCWORemote) thisValue.getMbo().getOwner();
 
         double currentValue = thisValue.getDouble();
         double oldValue = thisValue.getPreviousValue().asDouble();
@@ -40,8 +42,17 @@ public class ITCFldWpMatValorVenta extends MboValueAdapter {
         logdebug("oldValue", oldValue);
         logdebug("newValue", newValue);
 
-        logdebug(LOGRUNNING,"thisWO.itcIncrTotalMateriales(newValue);");
-        thisWO.itcIncrTotalMateriales(newValue);
+        logdebug(LOGRUNNING, "thisWO.itcIncrTotalMateriales(newValue);");
+
+        if (thisMbo.isBasedOn("WORKORDER")) {
+            logdebug("(thisMbo.isBasedOn(\"WORKORDER\"))");
+
+            ((ITCWORemote) thisMbo).itcIncrTotalMateriales(newValue);
+
+        } else if (thisMbo.isBasedOn("WOACTIVITY")) {
+            logdebug("elseif (thisMbo.isBasedOn(\"WOACTIVITY\")) ");
+            ((ITCWOActivityRemote) thisMbo).itcIncrTotalMateriales(newValue);
+        }
 
         logdebug(LOGEND, "action()");
     }
